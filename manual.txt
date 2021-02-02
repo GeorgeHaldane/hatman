@@ -1,0 +1,130 @@
+"->" - page
+"-" - step
+">>" - substep
+"$" - note
+
+
+
+###### CREATING LEVEL ######
+
+-> CREATE A LEVEL
+	- Use 'Tiled' to create a .JSON level
+	- Save at 'content/levels/'
+	- Tilesets are added as exteranl modules
+
+-> CREATE A TILESET
+	- Use 'Tiled' to create a .JSON tileset
+	- Select tileset source image from 'content/textures/tilesets/'
+	- Tile size is 32x32
+	- Save at 'content/tilesets/'
+
+-> ADD TILESET TO LEVEL
+	- In level 'Map->Add External Tileset'
+	
+
+
+###### CREATING TILES ######
+
+-> CREATE NEW UNIQUE (INTERACTIVE) TILE
+	- In header 'tile_unique.h' add a new class that inherits from 'Tile'
+	- Override methods 'checkActivation()', 'checkTrigger()', 'activate()', 'trigger()'
+	to setup custom interaction logic
+	- Add name of the new tile to the 'TILE_MAKERS' map to connect new class to the factory function
+	- To get a tile of a newly created class use 'tiles::make_tile()' that takes tile
+	interactive type and returns ownership over an object
+	$ Tiles are stored inside 'Level' object
+
+-> ADD INTERACTION TO A TILE IN TILESET
+	- Select tile in tileset file and add rectangle with properties: 'type:"actionbox"'
+	and 'interactive_type:<name of corresponding interactive type used in tiles::make_tile()>'
+	- This rectangle is an actionbox, used by tile interaction
+	- Only one actionbox can be attached to a tile!
+
+-> ADD HITBOX TO A TILE IN TILESET
+	- Select tile in tileset file and add rectangle with properties: 'type:"hitbox"'
+	- Multiple hitbox rectangles can be attached to a tile
+
+-> ADD ANIMATION TO A TILE IN TILESET
+	- Select tileset file, use option 'Tile Animation Editor'
+	- Start animation with a texture of a tile that should be animated!
+	- Editor allows user to add frames and adjust delays of animation
+
+-> ADD TILE TO LEVEL
+	- Create tile layer with any name
+	- Tiles are rendered in order of layer appearance in .JSON
+	- Add tiles to the layer
+
+
+
+###### CREATING ITEMS ######
+
+-> CREATE NEW UNIQUE ITEM
+	- In header 'item_unique.h' add a new class that inherits from 'Tile'
+	- Setup constructor to set item system name and in-game label
+	- Override method 'use()' to setup use effect (not required)
+	- Add name of the new item to the 'ITEM_MAKERS' map to connect new class to the factory function
+	- To get an item of a newly created class use 'items::make_item()' that takes item
+	name and returns ownership over an object
+	$ Items are stored inside 'Inventory' objects
+
+-> ADD ITEM TO LEVEL
+	$ This operation spawns entity corresponding to item!
+	$ Items as they are do not exist outside of inventories!
+	$ Item entity has to be implemented separately! 
+	- Create object layer that contains prefix '[entity]{item}'
+	- Use 'Insert Point' tool to add items to given positions
+	- Add properties:
+		>> [name]: <name of an item>
+
+
+
+###### CREATING ENTITIES ######
+
+-> CREATE NEW ENTITY TYPE
+	- In header 'entity_type.h' add a new class that inherits from 'Entity'
+	- Override 'update()' adding new functionality
+	$ Don't forget to call parent 'update()' at the start of derived 'update()'
+
+-> CREATE NEW UNIQUE ENTITY OF EXISTING TYPE
+	- In header 'entity_unique.h' add a new class that inherits from corresponding entity type class
+	- Setup constructor to set name and initialize visuals and physics
+	- Add entity type and name to the 'ENTITY_MAKERS' map to connect new class to the factory function
+	- Further customization varies for each unique entity
+	$ Don't forget to set default animation when using 'ControllableSprite'
+
+-> ADD ENTITY TO LEVEL
+	- Create object layer '[entity]{<name of the entity>}'
+	- Use 'Insert Point' tool to create entities at given positions
+
+
+
+###### CREATING SCRIPTS ######
+
+->  CREATE LEVEL SHANGE / LEVEL SWITCH
+	- Create object layer "[scripts]{level_change / level_switch}"
+	- Add object rectangles (script AOE)
+	- Add properties:
+		>> [goes_to_level]: <name of the level>
+		>> [goes_to_x]: <spawn x>
+		>> [goes_to_y]: <spawn y>
+	$ Level change triggers upon player entering AOE, level switch also requires "USE" key press
+
+->  CREATE LOGIC GATES
+	- Create object layer "[scripts]{OR / AND / XOR / NOR / NAND / XNOR}"
+	- Add object points (position is irrelevant)
+	- Add properties:
+		>> [emit_input]{0}: <emit>
+		>> [emit_input]{1}: <emit>
+		...
+		>> [emit_output]: <emit>
+		>> [emit_output_lifetime]: <emit duration>
+	$ Logic gates take emit inputs and produce a single emit output
+	$ Negative emit duration is for infinite emits
+
+-> CREATE 'PLAYER IN AREA'
+	- Create object layer "[scripts]{player_in_area}"
+	- Add object points (position is irrelevant)
+	- Add properties:
+		>> [emit_output]: <emit>
+		>> [emit_output_lifetime]: <emit duration>
+	$ Script emits constantly while player is in the area

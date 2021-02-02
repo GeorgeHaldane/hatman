@@ -1,0 +1,12 @@
+{
+    "levels": {
+        "GrayBricks_1": "default",
+        "GrayBricks_2": "default",
+        "GrayBricks_3": "default"
+    },
+    "player": {
+        "current_level": "GrayBricks_2",
+        "x": 115.85000000000007,
+        "y": 209.0
+    }
+}
